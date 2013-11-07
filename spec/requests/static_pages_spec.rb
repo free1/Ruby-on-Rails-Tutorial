@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'spec_helper'
 
-describe "StaticPages" do
+describe "Static pages" do
 
     # 申请局部变量
     let(:title_name) { "Ruby on Rails Tutorial Sample App" }
@@ -22,6 +22,22 @@ describe "StaticPages" do
         # it "should have the title 'Home'" do
         #     expect(page).to have_title("#{title_name} | Home")
         # end
+
+        describe "for signed-in users" do
+            let(:user) { FactoryGirl.create(:user) }
+            before do
+                FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
+                FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
+                sign_in user
+                visit root_path
+            end
+
+            it "should render the user is feed" do
+                user.feed.each do |item|
+                    expect(page).to have_selector("li##{item.id}", text: item.content)
+                end
+            end
+        end
     end
 
     describe "Help page" do
